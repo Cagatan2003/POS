@@ -13,6 +13,7 @@
   <style>
         body {
             margin: 0;
+           
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
         }
@@ -453,15 +454,17 @@
               <li class="nav-item ">
     <a href="/admin/expenses"><i class="fas fa-coins"></i> Expenses</a>
 </li>
+<li class="nav-item">
+    <a href="/admin/Sales"><i class="fas fa-chart-line"></i> Sales</a>
+</li>
+
         </ul>
     </div>
 
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <button class="btn btn-light me-3" id="toggleSidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+        
             <a class="navbar-brand" href="#">Products Panel</a>
             <div class="ms-auto d-flex align-items-center">
                
@@ -492,121 +495,131 @@
     <!-- Main Content -->
     <div class="content" id="content">
         <div class="container">
-            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="three-column">
-                    <!-- 1st Column: Product Image -->
-                  <div class="form-group">
-    <label for="productImage">Product Image</label>
-    <div class="image-placeholder" id="imagePreview">
-        <i class="fas fa-box-open"></i> <!-- Placeholder icon -->
+        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    <div class="three-column">
+        <!-- 1st Column: Product Image -->
+        <div class="form-group">
+            <label for="productImage">Product Image</label>
+            <div class="image-placeholder" id="imagePreview">
+                <i class="fas fa-box-open"></i> <!-- Placeholder icon -->
+            </div>
+            <input type="file" name="productImage" id="productImage" class="form-control mt-2" accept="image/*" onchange="previewImage(event)">
+            @error('productImage')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- 2nd Column: Product Name, Description, Category -->
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" name="productName" id="productName" class="form-control" placeholder="Type or select a product name" list="productNamesList" required>
+            <datalist id="productNamesList">
+                @foreach($categories as $category)
+                    @foreach($category->products as $product)
+                        <option value="{{ $product->productName }}" data-price="{{ $product->productPrice }}" data-stock="{{ $product->productStock }}" data-description="{{ $product->productDescription }}" data-category-id="{{ $product->categoryId }}" data-category-name="{{ $category->categoryName }}">
+                    @endforeach
+                @endforeach
+            </datalist>
+            @error('productName')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+
+            <label for="productDescription" style="margin-top:10px;">Product Description (Optional)</label>
+            <textarea name="productDescription" id="productDescription" class="form-control"></textarea>
+            @error('productDescription')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+
+            <label for="categoryId" style="margin-top:10px;">Product Category</label>
+            <select name="categoryId" id="categoryId" class="form-control" required>
+                <option value="">Select Category</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
+                @endforeach
+            </select>
+            @error('categoryId')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- 3rd Column: Product Price, Stock, Availability -->
+        <div class="form-group">
+            <label for="productPrice">Product Price</label>
+            <input type="number" name="productPrice" id="productPrice" class="form-control" min="0" step="0.01" required>
+            @error('productPrice')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+
+            <label for="productStock" style="margin-top:10px;">Product Stock (Optional)</label>
+            <input type="number" name="productStock" id="productStock" class="form-control" min="0">
+            @error('productStock')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+
+            <label for="productAvailability" style="margin-top:10px;">Product Availability</label>
+            <select name="productAvailability" id="productAvailability" class="form-control" required>
+                <option value="Available">Available</option>
+                <option value="Not Available">Not Available</option>
+            </select>
+            @error('productAvailability')
+                <div class="alert alert-danger mt-2">{{ $message }}</div>
+            @enderror
+        </div>
     </div>
-    <input type="file" name="productImage" id="productImage" class="form-control mt-2" accept="image/*" onchange="previewImage(event)">
-    @error('productImage')
-        <div class="alert alert-danger mt-2">{{ $message }}</div>
-    @enderror
-</div>
 
-                    <!-- 2nd Column: Product Name, Description, Category -->
-                    <div class="form-group">
-                         <label for="productName">Product Name</label>
-                    <input type="text" name="productName" id="productName" class="form-control" required>
-                    @error('productName')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
-       
+    <button type="submit" class="btn btn-success mt-3">Save Product</button>
+</form>
 
-                    <label for="productDescription">Product Description (Optional)</label>
-                    <textarea name="productDescription" id="productDescription" class="form-control"></textarea>
-                    @error('productDescription')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
-            
-
-                    <label for="categoryId">Product Category</label>
-                    <select name="categoryId" id="categoryId" class="form-control" required>
-                        <option value="">Select Category</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
-                        @endforeach
-                    </select>
-                    @error('categoryId')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
-            
-
-                    </div>
-
-                    <!-- 3rd Column: Product Price, Stock, Availability -->
-                    <div class="form-group">
-                          <label for="productPrice">Product Price</label>
-                    <input type="number" name="productPrice" id="productPrice" class="form-control" min="0" step="0.01" required>
-                    @error('productPrice')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
-             
-
-                    <label for="productStock">Product Stock (Optional)</label>
-                    <input type="number" name="productStock" id="productStock" class="form-control" min="0">
-                    @error('productStock')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
-            
-
-            
-                    <label for="productAvailability">Product Availability</label>
-                    <select name="productAvailability" id="productAvailability" class="form-control" required>
-                        <option value="Available">Available</option>
-                        <option value="Not Available">Not Available</option>
-                    </select>
-                    @error('productAvailability')
-                        <div class="alert alert-danger mt-2">{{ $message }}</div>
-                    @enderror
- 
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-success mt-3">Save Product</button>
-            </form>
             <!-- Add a Table Below the Form -->
-<div class="table-responsive mt-4">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Product Image</th>
-                <th>Product Name</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Category</th>
-                <th>Availability</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($products as $product)
-            <tr>
-                <td><img src="{{ asset('storage/' . $product->ProductImage) }}" alt="Product Image" width="50" height="50"></td>
-                <td>{{ $product->productName }}</td>
-                <td>₱{{ number_format($product->productPrice, 2) }}</td>
-                <td>{{ $product->productStock ?? 'N/A' }}</td>
-                <td>{{ $product->category->categoryName }}</td>
-                <td>{{ $product->productAvailability }}</td>
-                <td>
-                    <a href="{{ route('admin.products.edit', $product->productId) }}" class="text-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form action="{{ route('admin.products.destroy', $product->productId) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this product?');">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+<div class="table-responsive mt-4" style=" height: 212px; /* Adjusted height */
+    overflow-y: auto;">
+ <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product Image</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Stock In</th>
+            <th>Sold</th>
+            <th>Remaining</th>
+            <th>Category</th>
+            <th>Availability</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($products as $product)
+        <tr>
+            <td><img src="{{ asset('storage/' . $product->ProductImage) }}" alt="Product Image" width="50" height="50"></td>
+            <td>{{ $product->productName }}</td>
+            <td>₱{{ number_format($product->productPrice, 2) }}</td>
+            <td>{{ $product->productStock ?? 'N/A' }}</td>
+            <td>{{ $product->productSold ?? '0' }}</td>
+            <td>{{ $product->productRemaining ?? 'N/A' }}</td>
+            <td>{{ $product->category->categoryName }}</td>
+            <td>{{ $product->productAvailability }}</td>
+            <td>
+                <a href="{{ route('admin.products.edit', $product->productId) }}" class="text-primary">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form action="{{ route('admin.products.destroy', $product->productId) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this product?');">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="9">No products available</td>
+        </tr>
+        @endforelse
+    </tbody>
+</table>
+
 
     <!-- Pagination Links -->
     <div class="d-flex justify-content-center">
@@ -702,6 +715,57 @@
         });
     </script>
 @endif
+<script>
+    $(document).ready(function() {
+        // AJAX for storing product name and updating the dropdown list
+        $('form').on('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: "{{ route('admin.products.store') }}", // Ensure you have the correct route
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Add the new product name to the datalist dynamically
+                    var newOption = new Option(response.productName, response.productName);
+                    $('#productNamesList').append(newOption);
+
+                    // Optionally, reset the input fields after successful submission
+                    $('form')[0].reset();
+
+                    alert('Product saved and added to the list!');
+                },
+                error: function(response) {
+                    console.log(response);
+                    alert('There was an error saving the product.');
+                }
+            });
+        });
+    });
+</script>
+<script>
+    document.getElementById('productName').addEventListener('input', function() {
+        var selectedProductName = this.value;
+        
+        // Get the datalist options
+        var options = document.querySelectorAll('#productNamesList option');
+        
+        // Loop through options and match the product name
+        options.forEach(function(option) {
+            if (option.value === selectedProductName) {
+                // Populate the fields based on selected option's data attributes
+                document.getElementById('productPrice').value = option.getAttribute('data-price');
+                document.getElementById('productStock').value = option.getAttribute('data-stock');
+                document.getElementById('productDescription').value = option.getAttribute('data-description');
+                document.getElementById('categoryId').value = option.getAttribute('data-category-id');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

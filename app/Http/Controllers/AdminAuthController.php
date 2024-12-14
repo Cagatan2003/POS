@@ -33,7 +33,7 @@ public function register(Request $request)
         'AdminLname' => 'required|string|max:255',
         'AdminGender' => 'nullable|string|in:Male,Female,Other',
         'AdminBdate' => 'required|date',
-        'AdminPhone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
+        'AdminPhone' => 'nullable|string|max:30',
         'AdminAddress' => 'nullable|string|max:255',
         'AdminPassword' => 'required|string|min:8|confirmed',
         'AdminProfile' => 'nullable|image|max:2048', // Optional profile image validation

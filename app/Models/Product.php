@@ -7,27 +7,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-        protected $primaryKey = 'productId';
-
-    // If you are using non-incrementing primary keys
-    public $incrementing = true;
     use HasFactory;
 
+    // The table associated with the model
     protected $table = 'products';
 
+    // The primary key for the model
+    protected $primaryKey = 'productId';
+
+    // Specify the attributes that are mass assignable
     protected $fillable = [
-        'productName',
-        'productDescription',
-        'productPrice',
-        'productStock',
-        'categoryId',
-        'productAvailability',
-        'ProductImage',
+        'categoryId', 
+        'productName', 
+        'productDescription', 
+        'productPrice', 
+        'productStock', 
+        'productPullout', 
+        'productSold', 
+        'productRemaining', 
+        'productAvailability', 
+        'ProductImage'
     ];
 
-    // Define relationship with Category
+    // Optionally, you can define relationships with other models
+
+    // A product belongs to a category (assuming the categories table exists)
     public function category()
     {
-        return $this->belongsTo(Category::class, 'categoryId');
+        return $this->belongsTo(Category::class, 'categoryId', 'id');
     }
+
+    // You can also define any other relationships such as orders or reviews if applicable.
 }

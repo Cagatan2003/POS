@@ -1,5 +1,3 @@
-<!-- resources/views/cashier/register.blade.php -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
-            background-image: url('/image/bg.png');
+            background-image: url('/image/1.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             font-family: Arial, sans-serif;
@@ -59,6 +57,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+           
             width: 100%;
         }
 
@@ -70,6 +69,15 @@
 
         .gender-group input {
             width: auto;
+        }
+
+        .section-title {
+            grid-column: span 3;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
         }
 
         button {
@@ -120,22 +128,18 @@
         <form action="{{ route('cashier.register') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
-            <!-- Username -->
-            <div>
-                <label for="CashierUsername">Username:</label>
-                <input type="text" id="CashierUsername" name="CashierUsername" value="{{ old('CashierUsername') }}" required>
-                @error('CashierUsername') <div class="error">{{ $message }}</div> @enderror
-            </div>
+            <!-- Personal Details Section -->
+            <div class="section-title">Personal Information</div>
 
-            <!-- Email -->
-            <div>
-                <label for="CashierEmail">Email:</label>
-                <input type="email" id="CashierEmail" name="CashierEmail" value="{{ old('CashierEmail') }}" required>
-                @error('CashierEmail') <div class="error">{{ $message }}</div> @enderror
+            <!-- Profile Picture -->
+            <div style="margin-right:10px;">
+                <label for="CashierProfile">Profile Picture:</label>
+                <input type="file" id="CashierProfile" name="CashierProfile">
+                @error('CashierProfile') <div class="error">{{ $message }}</div> @enderror
             </div>
 
             <!-- First Name -->
-            <div>
+            <div style="margin-right:10px;">
                 <label for="CashierFname">First Name:</label>
                 <input type="text" id="CashierFname" name="CashierFname" value="{{ old('CashierFname') }}" required>
                 @error('CashierFname') <div class="error">{{ $message }}</div> @enderror
@@ -149,28 +153,28 @@
             </div>
 
             <!-- Last Name -->
-            <div>
+            <div style="margin-right:10px;">
                 <label for="CashierLname">Last Name:</label>
                 <input type="text" id="CashierLname" name="CashierLname" value="{{ old('CashierLname') }}" required>
                 @error('CashierLname') <div class="error">{{ $message }}</div> @enderror
             </div>
 
             <!-- Birth Date -->
-            <div>
+            <div style="margin-right:10px;">
                 <label for="CashierBdate">Birth Date:</label>
                 <input type="date" id="CashierBdate" name="CashierBdate" value="{{ old('CashierBdate') }}" required>
                 @error('CashierBdate') <div class="error">{{ $message }}</div> @enderror
             </div>
 
             <!-- Phone -->
-            <div>
+            <div >
                 <label for="CashierPhone">Phone:</label>
                 <input type="text" id="CashierPhone" name="CashierPhone" value="{{ old('CashierPhone') }}" required>
                 @error('CashierPhone') <div class="error">{{ $message }}</div> @enderror
             </div>
 
             <!-- Address -->
-            <div>
+            <div style="margin-right:10px;">
                 <label for="CashierAddress">Address:</label>
                 <input type="text" id="CashierAddress" name="CashierAddress" value="{{ old('CashierAddress') }}">
                 @error('CashierAddress') <div class="error">{{ $message }}</div> @enderror
@@ -186,11 +190,21 @@
                 @error('CashierGender') <div class="error">{{ $message }}</div> @enderror
             </div>
 
-            <!-- Profile -->
-            <div>
-                <label for="CashierProfile">Profile Picture:</label>
-                <input type="file" id="CashierProfile" name="CashierProfile">
-                @error('CashierProfile') <div class="error">{{ $message }}</div> @enderror
+            <!-- Login Details Section -->
+            <div class="section-title">Login Information</div>
+
+            <!-- Username -->
+            <div style="margin-right:10px;">
+                <label for="CashierUsername">Username:</label>
+                <input type="text" id="CashierUsername" name="CashierUsername" value="{{ old('CashierUsername') }}" required>
+                @error('CashierUsername') <div class="error">{{ $message }}</div> @enderror
+            </div>
+
+            <!-- Email -->
+            <div style="margin-right:10px;">
+                <label for="CashierEmail">Email:</label>
+                <input type="email" id="CashierEmail" name="CashierEmail" value="{{ old('CashierEmail') }}" required>
+                @error('CashierEmail') <div class="error">{{ $message }}</div> @enderror
             </div>
 
             <!-- Password -->

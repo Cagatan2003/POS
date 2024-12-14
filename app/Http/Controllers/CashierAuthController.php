@@ -19,34 +19,34 @@ class CashierAuthController extends Controller
     }
 
     // Cashier Login Logic
-    public function login(Request $request)
-    {
-        // Validate the request data
-        $credentials = $request->validate([
-            'CashierUsername' => 'required|string|max:255',
-            'CashierPass' => 'required|string|min:8',
-        ]);
 
-        // Attempt to find the cashier by username
-        $cashier = Cashier::where('CashierUsername', $credentials['CashierUsername'])->first();
+public function login(Request $request)
+{
+    // Validate the request
+    $credentials = $request->only('CashierUsername', 'CashierPass');
 
-        // Check if cashier exists and verify the password
-        if ($cashier && Hash::check($credentials['CashierPass'], $cashier->CashierPass)) {
-            // Check cashier status
-            if ($cashier->CashierStatus !== 'active') {
-                return back()->withErrors(['CashierUsername' => 'Your account is inactive. Please contact the admin.']);
-            }
+    // Attempt to find the cashier by username
+    $cashier = Cashier::where('CashierUsername', $credentials['CashierUsername'])->first();
 
-            // Log in using the custom cashier guard
-            Auth::guard('cashier')->login($cashier);
-
-            // Redirect to the intended page (cashier dashboard)
-            return redirect()->route('cashier.dashboard');
+    // Check if cashier exists and verify the password
+    if ($cashier && Hash::check($credentials['CashierPass'], $cashier->CashierPass)) {
+        // Check cashier status
+        if ($cashier->CashierStatus !== 'active') {
+            return back()->withErrors(['CashierUsername' => 'Your account is inactive. Please contact the admin.']);
         }
 
-        // If login fails, return with error message
-        return back()->withErrors(['CashierUsername' => 'Invalid credentials']);
+        // Log in using the custom cashier guard
+        Auth::guard('cashier')->login($cashier);
+
+        // Redirect to the intended page (cashier dashboard)
+        return redirect()->intended('/cashier/dashboard');
     }
+
+    // If login fails, return with error message
+    return back()->withErrors(['CashierUsername' => 'Invalid credentials']);
+}
+
+
 
     // Show Cashier Registration Form
     public function showRegistrationForm()
@@ -55,35 +55,38 @@ class CashierAuthController extends Controller
     }
 
     // Cashier Registration Logic
-    public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'CashierUsername' => 'required|string|max:255|unique:cashiers',
-            'CashierEmail' => 'required|email|max:255|unique:cashiers',
-            'CashierFname' => 'required|string|max:255',
-            'CashierMname' => 'nullable|string|max:255',
-            'CashierLname' => 'required|string|max:255',
-            'CashierPhone' => 'required|string|max:12',
-            'CashierAddress' => 'nullable|string|max:255',
-            'CashierGender' => 'nullable|string|in:Male,Female,Other',
-            'CashierProfile' => 'nullable|image|max:2048',
-            'CashierPass' => 'required|string|min:8|confirmed',
-            'CashierBdate' => 'required|date',
-        ]);
+  public function register(Request $request)
+{
+    $validated = $request->validate([
+        'CashierUsername' => 'required|string|max:255|unique:cashiers',
+        'CashierEmail' => 'required|email|max:255|unique:cashiers',
+        'CashierFname' => 'required|string|max:255',
+        'CashierMname' => 'nullable|string|max:255',
+        'CashierLname' => 'required|string|max:255',
+        'CashierPhone' => 'required|string|max:15',
+        'CashierAddress' => 'nullable|string|max:255',
+        'CashierGender' => 'nullable|string|in:Male,Female,Other',
+        'CashierProfile' => 'nullable|image|max:2048',
+        'CashierPass' => 'required|string|min:8|confirmed',
+        'CashierBdate' => 'required|date',
+    ]);
 
-        // File Upload
-        if ($request->hasFile('CashierProfile')) {
-            $validated['CashierProfile'] = $request->file('CashierProfile')->store('CashierProfiles', 'public');
-        }
-
-        // Insert Data
-        try {
-            Cashier::create($validated); // CashierPass will be hashed automatically
-            return redirect()->route('cashier.login')->with('success', 'Your registration was successful!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
+    // Handle file upload
+    if ($request->hasFile('CashierProfile')) {
+        $validated['CashierProfile'] = $request->file('CashierProfile')->store('CashierProfiles', 'public');
     }
+
+    // Explicitly set CashierStatus to 'inactive' (although the database default is already 'inactive')
+    $validated['CashierStatus'] = 'inactive';
+
+    // Insert into database
+    try {
+        Cashier::create($validated); // The password will be hashed automatically due to the mutator in the model
+        return redirect()->route('cashier.login')->with('success', 'Registration successful!');
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => $e->getMessage()]);
+    }
+}
 
 public function logout(Request $request)
 {
@@ -104,35 +107,6 @@ public function logout(Request $request)
         return view('cashier.dashboard', compact('categories', 'cashiers', 'products'));
     }
 
-    public function createOrder(Request $request)
-    {
-        // Create a new order
-        $order = Order::create([
-            'cashier_id' => $request->cashier_id,
-            'customerId' => $request->customerId,
-            'totalAmount' => $request->totalAmount,
-        ]);
+    
 
-        // Create invoice
-        $invoice = Invoice::create([
-            'orderId' => $order->orderId,
-            'totalAmount' => $order->totalAmount,
-            'paymentType' => $request->paymentType,
-            'amountPaid' => $request->amountPaid,
-            'changeGiven' => $request->changeGiven,
-        ]);
-
-        // Create order items
-        foreach ($request->orderItems as $item) {
-            $order->orderItems()->create([
-                'productId' => $item['productId'],
-                'orderType' => $item['orderType'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'subtotal' => $item['subtotal'],
-            ]);
-        }
-
-        return response()->json(['message' => 'Order created successfully', 'order' => $order]);
-    }
 }

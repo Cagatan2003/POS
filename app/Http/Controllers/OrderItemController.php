@@ -1,80 +1,117 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class OrderController extends Controller
+class OrderItemController extends Controller
 {
-    // Method for adding an item to the order
-  public function addToOrder(Request $request)
+
+
+    public function getProductsByCategory($categoryId)
+    {
+        // Get products based on the selected category
+        $products = Product::where('categoryId', $categoryId)->get();
+        return response()->json($products);
+    }
+
+    public function addToOrder(Request $request)
+    {
+        // Store product in the order summary session
+        $product = Product::find($request->productId);
+        $order = session()->get('order', []);
+        
+        $order[] = [
+            'product_id' => $product->productId,
+            'name' => $product->productName,
+            'quantity' => $request->quantity,
+            'price' => $product->productPrice,
+            'subtotal' => $product->productPrice * $request->quantity,
+        ];
+        
+        session(['order' => $order]);
+        return response()->json(['success' => 'Product added to order summary']);
+    }
+
+    public function showPaymentForm()
+    {
+        // Calculate the total from the order summary session
+        $order = session()->get('order');
+        $totalAmount = array_sum(array_column($order, 'subtotal'));
+        
+        return view('cashier.payment', compact('totalAmount'));
+    }
+
+    public function confirmPayment(Request $request)
+    {
+        // Create the order and invoice
+        $orderData = session()->get('order');
+        
+        // Generate order and customer IDs automatically
+        $order = Order::create([
+            'customerId' => $request->customerId,
+            'cashier_id' => auth()->id(), // Assuming cashier is logged in
+            'orderType' => $request->orderType,
+            'totalAmount' => array_sum(array_column($orderData, 'subtotal')),
+        ]);
+
+        // Save order items
+        foreach ($orderData as $item) {
+            OrderItem::create([
+                'orderId' => $order->orderId,
+                'productId' => $item['product_id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'subtotal' => $item['subtotal'],
+            ]);
+        }
+
+        // Create invoice
+        Invoice::create([
+            'orderId' => $order->orderId,
+            'totalAmount' => $order->totalAmount,
+            'paymentType' => $request->paymentType,
+            'amountPaid' => $request->amountPaid,
+            'changeGiven' => $request->amountPaid - $order->totalAmount,
+        ]);
+
+        // Clear the session after the order is confirmed
+        session()->forget('order');
+
+        return redirect()->route('cashier.dashboard')->with('success', 'Order successfully completed');
+    }
+    public function createOrder(Request $request)
 {
-    $request->validate([
-        'productId' => 'required|exists:products,productId',
-        'quantity' => 'required|numeric|min:1',
-        'price' => 'required|numeric',
-        'subtotal' => 'required|numeric',
+    // Create the order
+    $order = Order::create([
+        'cashier_id' => auth()->user()->cashier_id,
+        'customerId' => $request->customerId,
+        'totalAmount' => $request->totalAmount,
+        'orderType' => $request->orderType,  // 'Dine-in' or 'Take-out'
     ]);
 
-    // Retrieve or create an order ID (e.g., using session)
-    $orderId = session('orderId'); // You can generate a new order if needed
-
-    // Ensure a cashier ID is available
-    $cashierId = auth()->user()->id;  // Assuming you're using Laravel's built-in auth system
-
-    // Create a new order if orderId doesn't exist
-    if (!$orderId) {
-        $order = new Order();
-        $order->cashier_id = $cashierId;
-        $order->status = 'Pending';  // Set the default status as Pending
-        $order->save();
-        $orderId = $order->id;
-        session(['orderId' => $orderId]); // Store order ID in session
+    // Add each product in the cart to the order items
+    $cart = session('cart', []);
+    foreach ($cart as $item) {
+        OrderItem::create([
+            'orderId' => $order->orderId,
+            'productId' => $item['productId'],
+            'quantity' => $item['quantity'],
+            'price' => $item['productPrice'],
+            'subtotal' => $item['productPrice'] * $item['quantity'],
+        ]);
     }
 
-    // Insert the item into the orderitem table
-    $orderItem = new OrderItem();
-    $orderItem->orderId = $orderId;
-    $orderItem->productId = $request->productId;
-    $orderItem->quantity = $request->quantity;
-    $orderItem->price = $request->price;
-    $orderItem->subtotal = $request->subtotal;
-    $orderItem->save();
+    // Clear the cart after order creation
+    session()->forget('cart');
 
-    return response()->json(['message' => 'Item added to order', 'data' => $orderItem]);
+    // Redirect to invoice creation page
+    return redirect()->route('cashier.invoice.create', ['orderId' => $order->orderId]);
 }
 
-   
-
-    // Method to remove an item from the order
-    public function removeOrderItem($orderItemId)
-    {
-        $orderItem = OrderItem::find($orderItemId);
-        if ($orderItem) {
-            $orderItem->delete();
-            return response()->json(['message' => 'Item removed successfully']);
-        }
-
-        return response()->json(['message' => 'Item not found'], 404);
-    }
-
-    // Method to complete the order and finalize it
-    public function completeOrder(Request $request)
-    {
-        // Logic to finalize the order, like updating the order status and saving to orders table
-        $orderId = session('orderId');
-
-        // Example: Update order status to 'Completed'
-        $order = Order::find($orderId);
-        if ($order) {
-            $order->status = 'Completed';
-            $order->save();
-            return response()->json(['message' => 'Order completed successfully']);
-        }
-
-        return response()->json(['message' => 'Order not found'], 404);
-    }
 }

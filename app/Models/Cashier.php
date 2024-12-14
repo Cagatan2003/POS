@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +12,6 @@ class Cashier extends Authenticatable
     protected $primaryKey = 'cashier_id';
 
     protected $fillable = [
-        'Admin_Id',
         'CashierUsername',
         'CashierEmail',
         'CashierFname',
@@ -33,7 +31,7 @@ class Cashier extends Authenticatable
         'remember_token',
     ];
 
-    // Accessor to hash the password before saving
+    // Password Mutator to hash password before saving
     public function setCashierPassAttribute($value)
     {
         $this->attributes['CashierPass'] = bcrypt($value);

@@ -1,173 +1,204 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Cashier Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f7f7f7;
-            color: #333;
-            background-image: url('/image/bg.png');
-            background-size: cover;
-            background-position: center;
+            background-image: url('/image/1.jpg');
+            background-size: 1370px 750px;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-        }
-
-        .registration-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+            height: 100vh;
         }
 
-        .form-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
+            text-align: center; /* Center-align content inside the container */
+        }
+
+        .logo-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+            max-width: 150px;
+            height: auto;
+        }
+
+        h1 {
             text-align: center;
-        }
-
-        h2 {
-            color: #FF7043; /* Orange color */
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 32px;
-        }
-
-        .form-title {
-            font-size: 24px;
-            font-weight: bold;
             color: #333;
         }
 
-        .form-container .form-label {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .form-container .form-control {
-            border-radius: 8px;
-            padding: 12px;
+        .error {
+            color: red;
+            margin-bottom: 10px;
             font-size: 14px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+            text-align: center; /* Center-align labels */
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
-            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center; /* Center-align text in the input fields */
         }
 
-        .form-container .form-control:focus {
-            border-color: #FF7043; /* Orange focus border */
-            box-shadow: 0 0 5px rgba(255, 112, 67, 0.5); /* Light orange shadow */
-        }
-
-        .form-container button {
-            background-color: #43A047; /* Green button */
+        button {
+            padding: 10px;
+            background-color: #FFA500; /* Orange */
             color: white;
-            padding: 12px;
-            font-size: 18px;
-            width: 100%;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
+            font-size: 16px;
         }
 
-        .form-container button:hover {
-            background-color: #388E3C; /* Darker green on hover */
+        button:hover {
+            background-color: #FF8C00; /* Darker orange */
         }
 
-        .alert {
-            border-radius: 8px;
+        .password-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .eye-icon {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            font-size: 20px;
+            color: #28a745; /* Green */
+        }
+
+        .register-link {
+            text-align: center;
             margin-top: 15px;
         }
 
-        .alert ul {
-            padding-left: 20px;
+        .register-link a {
+            color: #28a745; /* Green */
+            text-decoration: none;
         }
 
-        .file-input-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        .admin-btn {
+            display: block;
+            margin-top: 15px;
+            background-color: #28a745; /* Green */
+            padding: 10px;
+            text-align: center;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
         }
 
-        #previewImage {
-            margin-top: 10px;
-            max-width: 100px;
-            display: none;
-            border-radius: 50%;
-        }
-
-        .d-flex {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .admin-btn:hover {
+            background-color: #218838; /* Darker green */
         }
     </style>
+    <!-- Font Awesome for Eye Icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="registration-container">
-        <div class="form-container">
-            <h2>Admin Login</h2>
 
-            <!-- Alerts -->
-            @if(session('success'))
-            <script>
-                Swal.fire({
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            </script>
+    <div class="container">
+        <img src="/image/logo.png" alt="Logo" class="logo-img">
+        <h1>Admin Login</h1>
+
+        <div class="error">
+            @if ($errors->has('AdminUsername'))
+                <p>{{ $errors->first('AdminUsername') }}</p>
             @endif
-
-            @if(session('error'))
-            <script>
-                Swal.fire({
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            </script>
+            @if ($errors->has('AdminPassword'))
+                <p>{{ $errors->first('AdminPassword') }}</p>
             @endif
-
-            @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-
-            <form method="POST" action="{{ route('admin.login') }}">
-                @csrf
-                <div class="mb-3">
-                    <label for="AdminUsername" class="form-label">Username</label>
-                    <input type="text" name="AdminUsername" id="AdminUsername" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="AdminPassword" class="form-label">Password</label>
-                    <input type="password" name="AdminPassword" id="AdminPassword" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
-              <div class="text-center mt-3">
-           <a href="{{ route('cashier.login') }}" class="admin-btn">Back to Cashier</a>
-            </div>
         </div>
-               
+
+        <form method="POST" action="{{ route('admin.login') }}">
+            @csrf
+            <div class="mb-3 password-container">
+                <label for="AdminUsername" class="form-label">Username</label>
+                <input type="text" name="AdminUsername" id="AdminUsername" class="form-control" required>
+            </div>
+            <div class="mb-3 password-container">
+                <label for="AdminPassword" class="form-label">Password</label>
+                <input type="password" name="AdminPassword" id="AdminPassword" class="form-control" required>
+                <i class="fas fa-eye eye-icon" id="seePassword" onclick="togglePassword()"></i>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{{ route('cashier.login') }}" class="admin-btn">Back to Cashier</a>
+        </div>
+
     </div>
+
+    <script>
+        function togglePassword() {
+            var passwordField = document.getElementById('AdminPassword');
+            var eyeIcon = document.getElementById('seePassword');
+            var passwordFieldType = passwordField.type;
+
+            if (passwordFieldType === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'OK'
+            });
+        @elseif(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'Try Again'
+            });
+        @endif
+    </script>
+
 </body>
+</html>

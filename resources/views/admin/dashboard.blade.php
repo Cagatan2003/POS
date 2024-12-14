@@ -25,7 +25,8 @@
     }
 
     body {
-       
+         
+    background-position: center;
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
       
@@ -394,9 +395,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <button class="btn btn-light me-3" id="toggleSidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+           
             <a class="navbar-brand" href="#">Admin Panel</a>
             <div class="ms-auto d-flex align-items-center">
                 <!-- Profile Dropdown -->

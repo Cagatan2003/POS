@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Admin;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -11,24 +12,24 @@ class ProductController extends Controller
 {
 public function create()
 {
-    // Paginate products
-    $products = Product::with('category')->paginate(10);
+    // Retrieve products from the cache or database
+    $products = Cache::remember('products_list', now()->addDay(), function () {
+        return Product::with('category')->paginate(10);
+    });
 
-    // Retrieve all categories (no need for pagination here)
+    // Get categories and admin info as before
     $categories = Category::all();
-
-    // Get the currently authenticated admin user
     $admin = auth()->user();
 
-    // Pass both products and categories to the view
     return view('admin.products', compact('categories', 'products', 'admin'));
 }
+
 
     public function store(Request $request)
     {
         // Validate and store the product details
         $request->validate([
-            'productImage' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'productImage' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'productName' => 'required|string|max:255',
             'productPrice' => 'required|numeric|min:0',
             'productDescription'=>'nullable|string|max:255',
@@ -52,6 +53,8 @@ public function create()
         }
 
         // Save the product to the database
+        Cache::forget('products_list');
+
         $product->save();
 
         return redirect()->route('admin.products')->with('success', 'Product created successfully!');

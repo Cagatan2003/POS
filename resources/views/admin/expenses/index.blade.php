@@ -17,6 +17,7 @@
     <style>
         body {
             margin: 0;
+          
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
             opacity: 1;
@@ -358,6 +359,7 @@
         .content {
             margin-left: 200px;
             padding: 20px;
+            height:500px;
             animation: slideInFromLeft 1s ease-out;
 
         }
@@ -422,6 +424,9 @@
            <li class="nav-item active">
     <a href="/admin/expenses"><i class="fas fa-coins"></i> Expenses</a>
 </li>
+<li class="nav-item">
+    <a href="/admin/Sales"><i class="fas fa-chart-line"></i> Sales</a>
+</li>
 
         </ul>
     </div>
@@ -429,9 +434,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <button class="btn btn-light me-3" id="toggleSidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+      
             <a class="navbar-brand" href="#">Expenses Panel</a>
             <div class="ms-auto d-flex align-items-center">
                  <div class="dropdown">

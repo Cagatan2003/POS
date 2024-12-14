@@ -34,6 +34,9 @@
         background-image: url('/image/bg.png');
         background-size: cover;
     }
+
+
+    
         .form-container {
             max-width: 700px;
             margin: 0 auto;

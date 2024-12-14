@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
-            background-image: url('/image/bg.png');
+            background-image: url('/image/1.jpg');
             background-size: 1370px 750px;
             background-repeat: no-repeat;
             font-family: Arial, sans-serif;
@@ -27,7 +27,19 @@
             border-radius: 8px;
             width: 100%;
             max-width: 400px;
+            text-align: center; /* Center-align content inside the container */
         }
+.logo-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margcd position: relative;in-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    max-width: 150px;
+    height: auto;
+}
+
 
         h1 {
             text-align: center;
@@ -122,11 +134,17 @@
 <body>
 
     <div class="container">
+        <img src="/image/logo.png" alt="Logo" class="logo-img">
         <h1>Cashier Login</h1>
 
-        @if(session('error'))
-            <div class="error">{{ session('error') }}</div>
-        @endif
+        <div class="error">
+            @if ($errors->has('CashierUsername'))
+                <p>{{ $errors->first('CashierUsername') }}</p>
+            @endif
+            @if ($errors->has('CashierPass'))
+                <p>{{ $errors->first('CashierPass') }}</p>
+            @endif
+        </div>
 
         <form method="POST" action="{{ route('cashier.login') }}">
             @csrf
@@ -136,7 +154,7 @@
             <div class="password-container">
                 <label for="CashierPass">Password:</label>
                 <input type="password" id="CashierPass" name="CashierPass" required aria-label="Password">
-                <i class="fas fa-eye eye-icon" id="seePassword" onclick="togglePassword()"></i> <!-- Eye icon for toggle -->
+                <i class="fas fa-eye eye-icon" id="seePassword" onclick="togglePassword()"></i>
             </div>
 
             <button type="submit">Login</button>

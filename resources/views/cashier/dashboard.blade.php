@@ -143,6 +143,7 @@
           
           <!-- Right Column: Payment Details -->
           <div class="col-md-6">
+            <form action="">
             <h5>Payment Details</h5>
             <div class="total">
               <p>Total: ₱<span id="modal-total-amount">300.00</span></p>
@@ -185,6 +186,7 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="confirm-payment">Confirm Payment</button>
       </div>
+      </form>
     </div>
   </div>
 </div>
@@ -363,6 +365,7 @@ function showCategoryProducts(categoryId) {
 }
 
 </script>
+
 <script></script>
 </body>
 </html>

@@ -14,6 +14,7 @@
 
     <style>
         body {
+         
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -397,15 +398,17 @@ body.fade-in {
               <li class="nav-item ">
     <a href="/admin/expenses"><i class="fas fa-coins"></i> Expenses</a>
 </li>
+     <li class="nav-item">
+    <a href="/admin/Sales"><i class="fas fa-chart-line"></i> Sales</a>
+</li>
+
         </ul>
     </div>
 
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <button class="btn btn-light me-3" id="toggleSidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+         
             <a class="navbar-brand" href="#">Cashier Panel</a>
             <div class="ms-auto d-flex align-items-center">
                 <div class="dropdown">
@@ -460,7 +463,8 @@ body.fade-in {
                 </script>
             @endif
 
-            <table class="table table-hover table-striped mt-2">
+            <table class="table table-hover table-striped mt-2" style=" height: 210px; /* Adjusted height */
+    overflow-y: auto;">
                 <thead class="table" style="  background-color: #28a745;">
                     <tr>
                         <th>#</th>
@@ -474,15 +478,15 @@ body.fade-in {
                 <tbody>
                     @foreach($cashiers as $cashier)
                         <tr onclick="updateCashierDetails({{ json_encode($cashier) }})" style="cursor: pointer;">
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $cashier->CashierFname }} {{ $cashier->CashierLname }}</td>
-                            <td>{{ $cashier->CashierEmail }}</td>
-                            <td>
+                            <td style="background-color:white;">{{ $loop->iteration }}</td>
+                            <td style="background-color:white;">{{ $cashier->CashierFname }} {{ $cashier->CashierLname }}</td>
+                            <td style="background-color:white;">{{ $cashier->CashierEmail }}</td>
+                            <td style="background-color:white;">
                                 <span class="badge bg-{{ $cashier->CashierStatus == 'active' ? 'success' : 'warning' }}">
                                     {{ ucfirst($cashier->CashierStatus) }}
                                 </span>
                             </td>
-                            <td >
+                            <td style="background-color:white;">
                                 <form action="{{ route('admin.cashier.activate', $cashier->cashier_id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
@@ -491,7 +495,7 @@ body.fade-in {
                                         {{ $cashier->CashierStatus == 'active' ? 'Deactivate' : 'Activate' }}
                                     </button>
                                 </form>
-                                </td><td>
+                                </td><td style="background-color:white;">
                   <form action="{{ route('admin.cashier.destroy', $cashier->cashier_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this cashier?');" style="display: inline;">
     @csrf
     @method('DELETE')
@@ -584,16 +588,7 @@ body.fade-in {
             document.getElementById('cashierAddress').innerText = `Address: ${cashier.CashierAddress}`;
         }
     </script>
-<script>document.addEventListener("DOMContentLoaded", function () {
-    // On page load, apply the fade-in effect
-    document.body.classList.add('fade-in');
-});
 
-window.addEventListener('beforeunload', function () {
-    // Before the page unloads, apply the fade-out effect
-    document.body.classList.add('fade-out');
-});
-</script>
 <!-- Add SweetAlert2 Library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

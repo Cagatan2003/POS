@@ -9,13 +9,19 @@ class Invoice extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'invoiceId'; // Custom primary key
+    protected $primaryKey = 'invoiceId';  // Define primary key if not 'id'
     protected $fillable = [
-        'orderId', 'totalAmount', 'amountPaid', 'changeGiven'
+        'orderId',
+        'totalAmount',
+        'paymentType',
+        'Gcash_receipt',
+        'amountPaid',
+        'changeGiven',
     ];
 
+    // Define the relationship with the orders table
     public function order()
     {
-        return $this->belongsTo(Order::class, 'orderId');
+        return $this->belongsTo(Order::class, 'orderId', 'orderId');
     }
 }
